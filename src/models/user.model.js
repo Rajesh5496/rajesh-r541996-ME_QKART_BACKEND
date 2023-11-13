@@ -4,7 +4,7 @@ const validator = require("validator");
 const config = require("../config/config");
 
 // TODO: CRIO_TASK_MODULE_UNDERSTANDING_BASICS - Complete userSchema, a Mongoose schema for "users" collection
-const userSchema = mongoose.Schema(
+const userSchema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -12,18 +12,36 @@ const userSchema = mongoose.Schema(
       trim: true,
     },
     email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      validate: {
+        validator: (value) => {
+          const emailRegex =
+            /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+          return emailRegex.test(value);
+        },
+        message: "Invalid email format",
+      },
     },
     password: {
       type: String,
-      validate(value) {
-        if (!value.match(/\d/) || !value.match(/[a-zA-Z]/)) {
-          throw new Error(
-            "Password must contain at least one letter and one number"
-          );
-        }
+      required: true,
+      trim: true,
+      minlength: 8,
+      validate: {
+        validator: function(v) {
+          // Custom validation function to check for at least one letter and one number
+          return /^(?=.*[a-zA-Z])(?=.*\d).*$/.test(v);
+        },
+        message: props => `${props.value} is not a valid password. It should contain at least one letter and one number.`,
       },
     },
     walletMoney: {
+      type: Number,
+      required: true,
+      default: config.default_wallet_money,
     },
     address: {
       type: String,
@@ -43,10 +61,14 @@ const userSchema = mongoose.Schema(
  * @returns {Promise<boolean>}
  */
 userSchema.statics.isEmailTaken = async function (email) {
+  const user = await this.findOne({ email });
+  return !!user;
 };
 
+const User = mongoose.model('user', userSchema);
 
-
+module.exports = { User };
+// module.exports = mongoose.model("user", userSchema);
 // TODO: CRIO_TASK_MODULE_UNDERSTANDING_BASICS
 /*
  * Create a Mongoose model out of userSchema and export the model as "User"

@@ -39,7 +39,38 @@ const { userService } = require("../services");
  *
  */
 const getUser = catchAsync(async (req, res) => {
+
+  console.log("line 43 user controller ")
+  
+    const { userId } = req.params;
+    // Use the User service layer to fetch user data by userId
+    // const user = await userService.findById(userId);
+    const user = await userService.getUserById(userId);
+
+    if (!user) {
+      // If user data doesn't exist, throw an ApiError
+      throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+    }
+    if (!user) {
+      return res.status(httpStatus.NOT_FOUND).json({ message: 'User not found' });
+    }
+  
+    res.status(httpStatus.OK).json(user);
+  
 });
+
+//     // If user data exists, return the user object
+//     return user;
+//   } catch (error) {
+//     // Handle and rethrow any errors
+//     if (error instanceof ApiError) {
+//       throw error; // Re-throw ApiError without modification
+//     } else {
+//       console.error('Error getting user details:', error);
+//       throw new Error('Failed to get user details');
+//     }
+//   }
+// });
 
 
 module.exports = {
