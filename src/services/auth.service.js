@@ -17,12 +17,7 @@ const { User } = require("../models");
  */
 
 const loginUserWithEmailAndPassword = async (email, password) => {
-  console.log("email", email)
-  console.log("password", password)
-  // const user = await userService.getUserByEmail(email);
-  const user = await User.findOne({ email: email });
-  console.log("user", user)
-  console.log(await user.isPasswordMatch(password))
+  const user = await userService.getUserByEmail(email);
   if(!user || !(await user.isPasswordMatch(password))){
     throw new ApiError(httpStatus.UNAUTHORIZED, "Incorrect email or password");
   }
