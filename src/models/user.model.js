@@ -2,9 +2,10 @@ const mongoose = require("mongoose");
 // NOTE - "validator" external library and not the custom middleware at src/middlewares/validate.js
 const validator = require("validator");
 const config = require("../config/config");
+const bcrypt = require("bcryptjs")
 
 // TODO: CRIO_TASK_MODULE_UNDERSTANDING_BASICS - Complete userSchema, a Mongoose schema for "users" collection
-const userSchema = new mongoose.Schema(
+const userSchema = mongoose.Schema(
   {
     name: {
       type: String,
@@ -13,30 +14,27 @@ const userSchema = new mongoose.Schema(
     },
     email: {
       type: String,
-      required: true,
       unique: true,
+      trim: true,
       lowercase: true,
+      required: true,
       validate: {
-        validator: (value) => {
-          const emailRegex =
-            /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
-          return emailRegex.test(value);
-        },
-        message: "Invalid email format",
+        validator: (value) => validator.isEmail(value),
+        message: "Invalid Email Address",
       },
     },
     password: {
       type: String,
-      required: true,
       trim: true,
-      minlength: 8,
-      validate: {
-        validator: function(v) {
-          // Custom validation function to check for at least one letter and one number
-          return /^(?=.*[a-zA-Z])(?=.*\d).*$/.test(v);
-        },
-        message: props => `${props.value} is not a valid password. It should contain at least one letter and one number.`,
+      validate(value) {
+        if (!value.match(/\d/) || !value.match(/[a-zA-Z]/)) {
+          throw new Error(
+            "Password must contain at least one letter and one number"
+          );
+        }
       },
+      minlength: 8,
+      required: true
     },
     walletMoney: {
       type: Number,
@@ -55,26 +53,51 @@ const userSchema = new mongoose.Schema(
 );
 
 // TODO: CRIO_TASK_MODULE_UNDERSTANDING_BASICS - Implement the isEmailTaken() static method
-/**
+/* *
  * Check if email is taken
  * @param {string} email - The user's email
  * @returns {Promise<boolean>}
  */
+
 userSchema.statics.isEmailTaken = async function (email) {
-  const user = await this.findOne({ email });
+  // static method to check if an email is already taken in the database
+  const user = await this.findOne({email:email});
+  // Returns true if user exists, otherwise false
   return !!user;
 };
 
-const User = mongoose.model('user', userSchema);
+userSchema.methods.isPasswordMatch = async function (password) {
+  const user = this;
+  console.log("model user",password)
+  console.log("model user pwd",user.password)
+  return await bcrypt.compare(password, user.password)
+}
 
-module.exports = { User };
-// module.exports = mongoose.model("user", userSchema);
+userSchema.pre("save", async function (next) {
+  const user = this;
+  if (user.isModified("password")) {
+    user.password = await bcrypt.hash(user.password, 10);
+  }
+  next();
+});
+
 // TODO: CRIO_TASK_MODULE_UNDERSTANDING_BASICS
 /*
  * Create a Mongoose model out of userSchema and export the model as "User"
  * Note: The model should be accessible in a different module when imported like below
  * const User = require("<user.model file path>").User;
  */
-/**
+
+userSchema.methods.hasSetNonDefaultAddress = async function () {
+  const user = this;
+  return user.address !== config.default_address
+}
+
+const User = mongoose.model("User",userSchema);
+
+module.exports.User = User;
+// module.exports = {User};
+
+/* *
  * @typedef User
  */

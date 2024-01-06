@@ -1,18 +1,25 @@
 const httpStatus = require("http-status");
 const ApiError = require("../utils/ApiError");
 const catchAsync = require("../utils/catchAsync");
-const { userService } = require("../services");
+const { userService, tokenService } = require("../services");
+const jwt = require('jsonwebtoken');
+const config = require('../config/config');
 
-// TODO: CRIO_TASK_MODULE_UNDERSTANDING_BASICS - Implement getUser() function
+// TODO: CRIO_TASK_MODULE_CART - Update function to process url with query params
 /**
  * Get user details
  *  - Use service layer to get User data
  * 
+ *  - If query param, "q" equals "address", return only the address field of the user
+ *  - Else,
  *  - Return the whole user object fetched from Mongo
 
  *  - If data exists for the provided "userId", return 200 status code and the object
  *  - If data doesn't exist, throw an error using `ApiError` class
  *    - Status code should be "404 NOT FOUND"
+ *    - Error message, "User not found"
+ *  - If the user whose token is provided and user whose data to be fetched don't match, throw `ApiError`
+ *    - Status code should be "403 FORBIDDEN"
  *    - Error message, "User not found"
  *
  * 
@@ -30,47 +37,52 @@ const { userService } = require("../services");
  *     "__v": 0
  * }
  * 
+ * Request url - <workspace-ip>:8082/v1/users/6010008e6c3477697e8eaba3?q=address
+ * Response - 
+ * {
+ *   "address": "ADDRESS_NOT_SET"
+ * }
+ * 
  *
  * Example response status codes:
  * HTTP 200 - If request successfully completes
+ * HTTP 403 - If request data doesn't match that of authenticated user
  * HTTP 404 - If user entity not found in DB
  * 
  * @returns {User | {address: String}}
  *
  */
+
+
 const getUser = catchAsync(async (req, res) => {
+  let user;
+  const { userId } = req.params;
 
-  console.log("line 43 user controller ")
-  
-    const { userId } = req.params;
-    // Use the User service layer to fetch user data by userId
-    // const user = await userService.findById(userId);
-    const user = await userService.getUserById(userId);
+  if(req.query.q == "address"){
+   user = await userService.getUserAddressById(userId);
+  } else {
+    user = await userService.getUserById(userId);  
+  }
 
-    if (!user) {
-      // If user data doesn't exist, throw an ApiError
-      throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
-    }
-    if (!user) {
-      return res.status(httpStatus.NOT_FOUND).json({ message: 'User not found' });
-    }
-  
-    res.status(httpStatus.OK).json(user);
-  
+  if(user){
+   if(user.email !== req.user.email){
+     throw new ApiError(httpStatus.FORBIDDEN,"User not Authenticated to see other user's data")
+   } else {
+     if(req.query.q == "address"){
+       res.send({
+         address: user.address
+       })
+     } else {
+       res.send(user)
+     }
+   }
+  } else {
+      throw new ApiError(httpStatus.NOT_FOUND,"User not found")
+  }
 });
 
-//     // If user data exists, return the user object
-//     return user;
-//   } catch (error) {
-//     // Handle and rethrow any errors
-//     if (error instanceof ApiError) {
-//       throw error; // Re-throw ApiError without modification
-//     } else {
-//       console.error('Error getting user details:', error);
-//       throw new Error('Failed to get user details');
-//     }
-//   }
-// });
+
+
 
 
 module.exports = {

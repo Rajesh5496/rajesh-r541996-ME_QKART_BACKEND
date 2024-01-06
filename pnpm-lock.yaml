@@ -26,6 +26,9 @@ dependencies:
   cross-env:
     specifier: ^7.0.0
     version: 7.0.3
+  date-fns:
+    specifier: ^3.0.6
+    version: 3.0.6
   dotenv:
     specifier: ^8.2.0
     version: 8.6.0
@@ -2811,6 +2814,10 @@ packages:
       whatwg-mimetype: 2.3.0
       whatwg-url: 7.1.0
     dev: true
+
+  /date-fns@3.0.6:
+    resolution: {integrity: sha512-W+G99rycpKMMF2/YD064b2lE7jJGUe+EjOES7Q8BIGY8sbNdbgcs9XFTZwvzc9Jx1f3k7LB7gZaZa7f8Agzljg==}
+    dev: false
 
   /dayjs@1.8.36:
     resolution: {integrity: sha512-3VmRXEtw7RZKAf+4Tv1Ym9AGeo8r8+CjDi26x+7SYQil1UqtqdaokhzoEJohqlzt0m5kacJSDhJQkG/LWhpRBw==}
