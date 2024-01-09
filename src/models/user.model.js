@@ -5,6 +5,7 @@ const config = require("../config/config");
 const bcrypt = require("bcryptjs")
 
 // TODO: CRIO_TASK_MODULE_UNDERSTANDING_BASICS - Complete userSchema, a Mongoose schema for "users" collection
+
 const userSchema = mongoose.Schema(
   {
     name: {
@@ -23,9 +24,12 @@ const userSchema = mongoose.Schema(
         message: "Invalid Email Address",
       },
     },
+    // password: {
+    //   type: String,
+    //   trim: true,
+    // },
     password: {
       type: String,
-      trim: true,
       validate(value) {
         if (!value.match(/\d/) || !value.match(/[a-zA-Z]/)) {
           throw new Error(
@@ -41,6 +45,8 @@ const userSchema = mongoose.Schema(
       required: true,
       default: config.default_wallet_money,
     },
+    // walletMoney: {
+    // },
     address: {
       type: String,
       default: config.default_address,
@@ -54,6 +60,7 @@ const userSchema = mongoose.Schema(
 
 // TODO: CRIO_TASK_MODULE_UNDERSTANDING_BASICS - Implement the isEmailTaken() static method
 /* *
+/**
  * Check if email is taken
  * @param {string} email - The user's email
  * @returns {Promise<boolean>}
@@ -70,18 +77,32 @@ userSchema.methods.isPasswordMatch = async function (password) {
   const user = this;
   console.log("model user",password)
   console.log("model user pwd",user.password)
-  return await bcrypt.compare(password, user.password)
+  return bcrypt.compare(password, user.password)
 }
 
 userSchema.pre("save", async function (next) {
   const user = this;
   if (user.isModified("password")) {
-    user.password = await bcrypt.hash(user.password, 10);
+    console.log("line 86 user.model.js")
+    // user.password = await bcrypt.hash(user.password, 10);
   }
   next();
 });
 
 // TODO: CRIO_TASK_MODULE_UNDERSTANDING_BASICS
+// userSchema.statics.isEmailTaken = async function (email) {
+// };
+
+/**
+ * Check if entered password matches the user's password
+ * @param {string} password
+ * @returns {Promise<boolean>}
+ */
+// userSchema.methods.isPasswordMatch = async function (password) {
+// };
+
+
+
 /*
  * Create a Mongoose model out of userSchema and export the model as "User"
  * Note: The model should be accessible in a different module when imported like below
@@ -99,5 +120,6 @@ module.exports.User = User;
 // module.exports = {User};
 
 /* *
+/**
  * @typedef User
  */

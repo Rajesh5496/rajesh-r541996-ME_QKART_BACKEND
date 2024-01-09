@@ -40,6 +40,7 @@ const register = catchAsync(async (req, res) => {
       tokens
     }
     res.status(201).json(result);
+// const register = catchAsync(async (req, res) => {
 });
 
 /**
@@ -81,8 +82,9 @@ const login = catchAsync(async (req, res) => {
 
    res.status(httpStatus.OK).json(result);
   });
+// });
 
 module.exports = {
   register,
-  login,
-};
+  login
+}

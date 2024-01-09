@@ -4,6 +4,7 @@ const catchAsync = require("../utils/catchAsync");
 const { userService, tokenService } = require("../services");
 const jwt = require('jsonwebtoken');
 const config = require('../config/config');
+// const { userService } = require("../services");
 
 // TODO: CRIO_TASK_MODULE_CART - Update function to process url with query params
 /**
@@ -85,6 +86,32 @@ const getUser = catchAsync(async (req, res) => {
 
 
 
+// module.exports = {
+//   getUser,
+// const getUser = catchAsync(async (req, res) => {
+// });
+
+const setAddress = catchAsync(async (req, res) => {
+  const user = await userService.getUserById(req.params.userId);
+
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found");
+  }
+  if (user.email != req.user.email) {
+    throw new ApiError(
+      httpStatus.FORBIDDEN,
+      "User not authorized to access this resource"
+    );
+  }
+
+  const address = await userService.setAddress(user, req.body.address);
+
+  res.send({
+    address: address,
+  });
+});
+
 module.exports = {
   getUser,
+  setAddress,
 };

@@ -57,7 +57,6 @@ const getProductById = catchAsync(async (req, res) => {
  *
  */
 const getProducts = catchAsync(async (req, res) => {
-  // req.query.title="soap"
   const products = await productService.getProducts();
   res.send(products);
 });

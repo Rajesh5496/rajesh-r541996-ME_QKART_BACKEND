@@ -13,3 +13,6 @@ mongoose.connect(`${config.mongoose.url}`, config.mongoose.options).then(()=>{
 app.listen(config.port, ()=>{
     console.log('Listening on port', config.port);
 })
+
+// let server;
+

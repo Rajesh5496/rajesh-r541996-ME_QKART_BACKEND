@@ -1,10 +1,12 @@
 const { User } = require("../models/user.model");
+// const { User } = require("../models");
 const httpStatus = require("http-status");
 const ApiError = require("../utils/ApiError");
 const bcrypt = require("bcryptjs");
 
 // TODO: CRIO_TASK_MODULE_UNDERSTANDING_BASICS - Implement getUserById(id)
 /* *
+/**
  * Get User by id
  * - Fetch user object from Mongo using the "_id" field and return user object
  * @param {String} id
@@ -17,6 +19,7 @@ const getUserById =  async (id) => {
 
 // TODO: CRIO_TASK_MODULE_UNDERSTANDING_BASICS - Implement getUserByEmail(email)
 /* *
+/**
  * Get user by email
  * - Fetch user object from Mongo using the "email" field and return user object
  * @param {string} email
@@ -24,11 +27,12 @@ const getUserById =  async (id) => {
  */
 
 const getUserByEmail = async(email) => {
-    return await User.findOne({email: email});
+    return await User.findOne({email});
 }
 
 // TODO: CRIO_TASK_MODULE_UNDERSTANDING_BASICS - Implement createUser(user)
 /* *
+/**
  * Create a user
  *  - check if the user with the email already exists using `User.isEmailTaken()` method
  *  - If so throw an error using the `ApiError` class. Pass two arguments to the constructor,
@@ -54,13 +58,20 @@ const createUser = async (userBody) => {
     const {email} = userBody;
     const isEmailTaken = await User.isEmailTaken(email);
     if(isEmailTaken){
+        console.log("line 61 user.service.js")
         throw new ApiError(httpStatus.OK, "Email Already Taken")
     } else {
         const hashedPassword = await bcrypt.hash(userBody.password, 10);
+        console.log("user.service.js crateUser", JSON.stringify(userBody))
         const newUser = await User.create({
-            ...userBody,
-            password: hashedPassword
+            name: userBody.name,
+            password: hashedPassword,
+            email: userBody.email,
         })
+        // const newUser = await User.create({
+        //     ...userBody,
+        //     password: hashedPassword
+        // })
         return newUser;
     }
 }
@@ -100,3 +111,9 @@ module.exports = {
     createUser,
     setAddress
 }
+//   user.address = newAddress;
+//   await user.save();
+
+//   return user.address;
+// };
+

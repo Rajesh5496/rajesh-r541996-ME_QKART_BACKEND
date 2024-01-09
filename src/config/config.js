@@ -8,8 +8,6 @@ const DEFAULT_ADDRESSS = "ADDRESS_NOT_SET";
 
 dotenv.config({ path: path.join(__dirname, '../../.env') });
 
-
-
 const envVarsSchema = Joi.object()
   .keys({
     NODE_ENV: Joi.string()
@@ -26,8 +24,6 @@ const envVarsSchema = Joi.object()
 
 const { value: envVars, error } = envVarsSchema.prefs({ errors: { label: 'key' } }).validate(process.env);
 
-// console.log("envars",JSON.stringify(envVars))
-
 if (error) {
   throw new Error(`Config validation error: ${error.message}`);
 }
@@ -37,7 +33,7 @@ module.exports = {
   port: envVars.PORT,
   // Set mongoose configuration
   mongoose: {
-    url: envVars.MONGODB_URL + (envVars.NODE_ENV === "test" ? "-test" : ""),
+    url: envVars.MONGODB_URL + (envVars.NODE_ENV === "test" ? "-test" : "/qkart"),
     options: {
       useCreateIndex: true,
       useNewUrlParser: true,
