@@ -33,7 +33,7 @@ module.exports = {
   port: envVars.PORT,
   // Set mongoose configuration
   mongoose: {
-    url: envVars.MONGODB_URL + (envVars.NODE_ENV === "test" ? "-test" : "/qkart"),
+    url: envVars.MONGODB_URL + (envVars.NODE_ENV === "test" ? "-test" : ""),
     options: {
       useCreateIndex: true,
       useNewUrlParser: true,

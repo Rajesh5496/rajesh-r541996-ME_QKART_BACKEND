@@ -25,7 +25,7 @@ describe("Cart test", () => {
 
     it("should throw error if user does not have a cart", async () => {
       mockingoose(Cart).toReturn(null, "findOne");
-     await expect(cartService.getCartByUser(userOne.email)).rejects.toThrow(
+      expect(cartService.getCartByUser(userOne.email)).rejects.toThrow(
         ApiError
       );
     });
@@ -77,7 +77,7 @@ describe("Cart test", () => {
       const qty = 5;
       const res = cartService.addProductToCart(userOne, productOne._id, qty);
 
-      await expect(res).rejects.toThrow(ApiError);
+      expect(res).rejects.toThrow(ApiError);
       expect(res).rejects.toEqual(
         expect.objectContaining({
           statusCode: httpStatus.INTERNAL_SERVER_ERROR,
@@ -126,7 +126,7 @@ describe("Cart test", () => {
       const qty = 5;
       const res = cartService.updateProductInCart(userOne, productOne._id, qty);
 
-      await expect(res).rejects.toThrow(ApiError);
+      expect(res).rejects.toThrow(ApiError);
 
       expect(res).rejects.toEqual(
         expect.objectContaining({
@@ -142,7 +142,7 @@ describe("Cart test", () => {
       const qty = 5;
       const res = cartService.updateProductInCart(userOne, productOne._id, qty);
 
-      await expect(res).rejects.toThrow(ApiError);
+      expect(res).rejects.toThrow(ApiError);
 
       expect(res).rejects.toEqual(
         expect.objectContaining({
@@ -172,7 +172,7 @@ describe("Cart test", () => {
 
       const res = cartService.deleteProductFromCart(userOne, productOne._id);
 
-      await expect(res).rejects.toThrow(ApiError);
+      expect(res).rejects.toThrow(ApiError);
 
       expect(res).rejects.toEqual(
         expect.objectContaining({
@@ -187,7 +187,7 @@ describe("Cart test", () => {
 
       const res = cartService.deleteProductFromCart(userOne, productOne._id);
 
-      await expect(res).rejects.toThrow(ApiError);
+      expect(res).rejects.toThrow(ApiError);
 
       expect(res).rejects.toEqual(
         expect.objectContaining({
